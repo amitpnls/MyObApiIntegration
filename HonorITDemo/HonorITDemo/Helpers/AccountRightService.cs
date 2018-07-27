@@ -30,7 +30,6 @@ namespace HonorITDemo.Helpers
         public QuotesModel GetQuoteList(string MYOBToken)
         {
             QuotesModel quotes = new QuotesModel();
-            // string MYOBToken = OAuthInformation.Token.AccessToken;
             string bURL = string.Format("{0}{1}/Sale/Quote/Service", baseUrl, companyUID);
             
             try
@@ -41,12 +40,14 @@ namespace HonorITDemo.Helpers
                     return quotes;
                 }
                 quotes = Newtonsoft.Json.JsonConvert.DeserializeObject<QuotesModel>(jsonResponseString);
+
+              return quotes;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
-            return quotes;
+            // return quotes;
         }
 
         //Get Purchase order List for Account Rights Api.
@@ -65,9 +66,9 @@ namespace HonorITDemo.Helpers
                 }
                 rootobj = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseOrderModel>(jsonResponseString);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
             return rootobj;
         }
@@ -93,8 +94,6 @@ namespace HonorITDemo.Helpers
 
                 byte[] pbytes = Encoding.UTF8.GetBytes(quoteJson);
 
-               //string bURL = "https://api.myob.com/accountright/32e7d2a5-a89f-4be8-af70-b2aeb789c203/Purchase/Order/Service";
-
                 string bURL = string.Format("{0}{1}/Purchase/Order/Service", baseUrl, companyUID);
 
                 HttpWebRequest purchaserequest = (HttpWebRequest)HttpWebRequest.Create(bURL);
@@ -116,7 +115,6 @@ namespace HonorITDemo.Helpers
                 purchaseStream = webresponse.GetResponseStream();
                 StreamReader reader = new StreamReader(purchaseStream);
                 string responseServer = reader.ReadToEnd();
-                // MessageBox.Show(responseServer);
                 reader.Close();
                 purchaseStream.Close();
                 webresponse.Close();
@@ -136,7 +134,6 @@ namespace HonorITDemo.Helpers
             {
                 try
                 {
-                    //string url = string.Format("https://api.myob.com/accountright/32e7d2a5-a89f-4be8-af70-b2aeb789c203/Purchase/Order/Item/{0}", purchase.UID);
                     string bURL = string.Format("{0}{1}/Purchase/Order/Item/{2}", baseUrl, companyUID, purchase.UID);
 
                     HttpWebRequest purchaserequest = (HttpWebRequest)HttpWebRequest.Create(bURL);
@@ -167,7 +164,6 @@ namespace HonorITDemo.Helpers
         //Get Supplier List
         public SupplierModel GetSupplierListAR(string MYOBToken)
         {
-            //string bURL = "https://ar1.api.myob.com/accountright/32e7d2a5-a89f-4be8-af70-b2aeb789c203/Contact/Supplier";
             string bURL = string.Format("{0}{1}/Contact/Supplier", baseUrl, companyUID);
             SupplierModel rootobj = new SupplierModel();
 
@@ -180,10 +176,12 @@ namespace HonorITDemo.Helpers
                     return rootobj;
                 }
                 rootobj = Newtonsoft.Json.JsonConvert.DeserializeObject<SupplierModel>(jsonResponseString);
+
+                return rootobj;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
             return rootobj;
         }
@@ -208,7 +206,8 @@ namespace HonorITDemo.Helpers
             }
             return jsonResponse;
         }
-
+        
+        //Convert usercredentials into Base64Encode string 
         public string Base64Encode(string username, string password = "")
         {
             string credentials = username+":"+password;

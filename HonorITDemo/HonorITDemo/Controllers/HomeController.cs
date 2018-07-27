@@ -23,7 +23,6 @@ namespace HonorITDemo.Controllers
 
         public ActionResult Index()
         {
-           // CallOAuthAuthentication();
 
             return View();
         }
@@ -38,19 +37,31 @@ namespace HonorITDemo.Controllers
         [HttpGet]
         public ActionResult QuoteList()
         {
-            //Session["tokenstatus"] = 1;
             AccountRightService service = new AccountRightService();
+
+            if (OAuthInformation.Token == null)
+            {
+                ReGenerateToken();
+            }
+
             string MYOBToken = OAuthInformation.Token.AccessToken;
 
             QuotesModel quotes = service.GetQuoteList(MYOBToken);
 
             return View(quotes);
         }
-   
+       
+
         public ActionResult PurchaseOrderAR()
         {
-            string MYOBToken = OAuthInformation.Token.AccessToken;
             AccountRightService service = new AccountRightService();
+
+            if (OAuthInformation.Token == null)
+            {
+                ReGenerateToken();
+            }
+
+            string MYOBToken = OAuthInformation.Token.AccessToken;
 
             QuotesModel quotes = service.GetQuoteList(MYOBToken);
             
@@ -61,10 +72,16 @@ namespace HonorITDemo.Controllers
 
         public ActionResult CreatePurchaseOrderAR()
         {
-            string MYOBToken = OAuthInformation.Token.AccessToken;
             AccountRightService service = new AccountRightService();
 
-           QuotesModel quotes = service.GetQuoteList(MYOBToken);
+            if (OAuthInformation.Token == null)
+            {
+                ReGenerateToken();
+            }
+
+            string MYOBToken = OAuthInformation.Token.AccessToken;
+
+            QuotesModel quotes = service.GetQuoteList(MYOBToken);
 
             service.CreatePurchaseOrderFromQuotes(quotes,MYOBToken);
 
@@ -73,6 +90,11 @@ namespace HonorITDemo.Controllers
 
         public ActionResult DeletePurchaseOrderAR()
         {
+            if (OAuthInformation.Token == null)
+            {
+                ReGenerateToken();
+            }
+
             string MYOBToken = OAuthInformation.Token.AccessToken;
             AccountRightService service = new AccountRightService();
 
@@ -81,6 +103,11 @@ namespace HonorITDemo.Controllers
             service.DeletePurchaseOrder(rootobj, MYOBToken);
 
             return Redirect("PurchaseOrderAR");
+        }
+
+        public void ReGenerateToken()
+        {
+            CallOAuthAuthentication();
         }
 
         public void CallOAuthAuthentication()
@@ -113,25 +140,8 @@ namespace HonorITDemo.Controllers
             OAuthInformation.Token.RefreshToken = oauthtoken.RefreshToken;
             OAuthInformation.Token.ExpiresIn = oauthtoken.ExpiresIn;
 
-            //Session["tokenstatus"] = 1;
-
-
-            //if (Convert.ToInt32(Session["tokenstatus"]) == 1)
-            //{
-            //    return RedirectToAction("QuoteList", "Home");
-            //}
-            //else if (Convert.ToInt32(Session["tokenstatus"]) == 2)
-            //{
-            //    return RedirectToAction("PurchaseOrderAR", "Home");
-            //}
-            //else if (Convert.ToInt32(Session["tokenstatus"]) == 3)
-            //{
-            //    return RedirectToAction("QuoteList", "Home");
-            //}
             return RedirectToAction("QuoteList", "Home");
         }
-
-       
 
         public ActionResult About()
         {
@@ -166,16 +176,6 @@ namespace HonorITDemo.Controllers
                 HttpContextFactory.Current.Session["OAuthInfo"] = value;
             }
         }
-        //public IOAuthKeyService KeyService
-        //{
-        //    get
-        //    {
-        //        var keyService = Session["KeyService"] as IOAuthKeyService ?? new SimpleOAuthKeyService();
-
-        //        return keyService;
-        //    }
-        //    set { Session["KeyService"] = value; }
-        //}
 
         public ActionResult Contact()
         {
