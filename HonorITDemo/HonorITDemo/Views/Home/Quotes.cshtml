@@ -1,0 +1,27 @@
+﻿@model HonorITDemo.Models.QuotesModel
+@{
+    ViewBag.Title = "About";
+    @*<script src="~/Scripts/jquery-1.10.2.min.js"></script>*@
+}
+<h2>@ViewBag.Title.</h2>
+<h3>@ViewBag.Message</h3>
+
+
+@using (Html.BeginForm("Quotes", "Home", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    <h4>Purchase order.</h4>
+    <hr/>
+    <div class="main-form">
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <div style="margin-top:20px">
+                    @*@Html.Partial("QuoteList",Model)*@
+                </div>
+                @*@Html.TextAreaFor(x => x.RowVersion, new {@class = "form-control"})*@
+                <input type="submit" class="btn btn-default" value="Submit"/>
+            </div>
+        </div>
+        <input type="submit" class="btn btn-default" value="Submit" />
+
+    </div>
+}
