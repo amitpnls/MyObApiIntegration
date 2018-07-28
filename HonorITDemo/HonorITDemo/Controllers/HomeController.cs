@@ -3,10 +3,11 @@ using System.Web.Mvc;
 using HonorITDemo.Helpers;
 using HonorITDemo.Models;
 using System.Web.Configuration;
+using System.Net.Http;
 
 namespace HonorITDemo.Controllers
 {
-    public class HomeController : Controller
+    public partial class HomeController : Controller
     {
        string apiBaseUrl = WebConfigurationManager.AppSettings["authorizationUrl"]; 
        string client_id = WebConfigurationManager.AppSettings["clientId"];
@@ -14,6 +15,8 @@ namespace HonorITDemo.Controllers
        string redirect_uri = WebConfigurationManager.AppSettings["redirectUrl"];
        string tokenUrl = WebConfigurationManager.AppSettings["tokenUrl"];
        string scope = WebConfigurationManager.AppSettings["scope"];
+
+        IAccountRightService _acountRightService = new AccountRightService();
 
         public ActionResult Index()
         {
@@ -26,71 +29,70 @@ namespace HonorITDemo.Controllers
         [HttpGet]
         public ActionResult QuoteList()
         {
-            AccountRightService service = new AccountRightService();
+            //IAccountRightService service = new AccountRightService();
 
-            if (OAuthInformation.Token == null)
+            if (OAuthKeyService.OAuthInformation.Token == null)
             {
                 ReGenerateToken();
             }
 
-            string MYOBToken = OAuthInformation.Token.AccessToken;
+            string MYOBToken = OAuthKeyService.OAuthInformation.Token.AccessToken;
 
-            QuotesModel quotes = service.GetQuoteList(MYOBToken);
+            QuotesModel quotes = _acountRightService.GetQuoteList(MYOBToken);
+
+            TempData["QuotesList"] = quotes;
 
             return View(quotes);
         }
-       
 
         public ActionResult PurchaseOrderAR()
         {
-            AccountRightService service = new AccountRightService();
-
-            if (OAuthInformation.Token == null)
+            if (OAuthKeyService.OAuthInformation.Token == null)
             {
                 ReGenerateToken();
             }
 
-            string MYOBToken = OAuthInformation.Token.AccessToken;
+            string MYOBToken = OAuthKeyService.OAuthInformation.Token.AccessToken;
 
-            QuotesModel quotes = service.GetQuoteList(MYOBToken);
+            QuotesModel quotes = _acountRightService.GetQuoteList(MYOBToken);
             
-            PurchaseOrderModel rootobj = service.GetPurchaseOrderListAR(MYOBToken);
+            PurchaseOrderModel rootobj = _acountRightService.GetPurchaseOrderListAR(MYOBToken);
 
             return View(rootobj);
         }
 
         public ActionResult CreatePurchaseOrderAR()
         {
-            AccountRightService service = new AccountRightService();
-
-            if (OAuthInformation.Token == null)
+            if (OAuthKeyService.OAuthInformation.Token == null)
             {
                 ReGenerateToken();
             }
 
-            string MYOBToken = OAuthInformation.Token.AccessToken;
+            string MYOBToken = OAuthKeyService.OAuthInformation.Token.AccessToken;
 
-            QuotesModel quotes = service.GetQuoteList(MYOBToken);
+            //QuotesModel quotes = service.GetQuoteList(MYOBToken);
 
-            service.CreatePurchaseOrderFromQuotes(quotes,MYOBToken);
+            QuotesModel quotes = new QuotesModel();
+
+            quotes = TempData["QuotesList"] as QuotesModel;
+
+            _acountRightService.CreatePurchaseOrderFromQuotes(quotes,MYOBToken);
 
             return Redirect("PurchaseOrderAR");
         }
 
         public ActionResult DeletePurchaseOrderAR()
         {
-            if (OAuthInformation.Token == null)
+            if (OAuthKeyService.OAuthInformation.Token == null)
             {
                 ReGenerateToken();
             }
 
-            string MYOBToken = OAuthInformation.Token.AccessToken;
+            string MYOBToken = OAuthKeyService.OAuthInformation.Token.AccessToken;
 
-            AccountRightService service = new AccountRightService();
+            PurchaseOrderModel rootobj = _acountRightService.GetPurchaseOrderListAR(MYOBToken);
 
-            PurchaseOrderModel rootobj = service.GetPurchaseOrderListAR(MYOBToken);
-
-            service.DeletePurchaseOrder(rootobj, MYOBToken);
+            _acountRightService.DeletePurchaseOrder(rootobj, MYOBToken);
 
             return Redirect("PurchaseOrderAR");
         }
@@ -102,7 +104,7 @@ namespace HonorITDemo.Controllers
 
         public void CallOAuthAuthentication()
         {
-            OAuthInformation.GetAuthorizationCode();
+            OAuthKeyService.OAuthInformation.GetAuthorizationCode();
         }
      
         //Authentication 
@@ -124,42 +126,13 @@ namespace HonorITDemo.Controllers
             //Retrieve Access token
             OAuthToken oauthtoken = OAuthServiceHelper.GetAccessToken(info, code);
 
-            if (OAuthInformation.Token == null)
-                OAuthInformation.Token = new OAuthToken();
-            OAuthInformation.Token.AccessToken = oauthtoken.AccessToken;
-            OAuthInformation.Token.RefreshToken = oauthtoken.RefreshToken;
-            OAuthInformation.Token.ExpiresIn = oauthtoken.ExpiresIn;
+            if (OAuthKeyService.OAuthInformation.Token == null)
+                OAuthKeyService.OAuthInformation.Token = new OAuthToken();
+            OAuthKeyService.OAuthInformation.Token.AccessToken = oauthtoken.AccessToken;
+            OAuthKeyService.OAuthInformation.Token.RefreshToken = oauthtoken.RefreshToken;
+            OAuthKeyService.OAuthInformation.Token.ExpiresIn = oauthtoken.ExpiresIn;
 
             return RedirectToAction("QuoteList", "Home");
-        }
-
-    
-        public OAuthInfo OAuthInformation
-        {
-            get
-            {
-                var info = HttpContextFactory.Current.Session["OAuthInfo"] as OAuthInfo;
-
-                if (info == null)
-                {
-                    info = new OAuthInfo
-                    {
-                        AuthorizationUrl = apiBaseUrl,
-                        Key = client_id,
-                        TokenUrl = tokenUrl,
-                        Secret = client_secret,
-                        RedirectUri = redirect_uri,
-                        Scope = scope
-                    };
-
-                    HttpContextFactory.Current.Session["OAuthInfo"] = info;
-                }
-                return info;
-            }
-            set
-            {
-                HttpContextFactory.Current.Session["OAuthInfo"] = value;
-            }
         }
 
         public ActionResult About()

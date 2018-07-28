@@ -3,6 +3,7 @@ using System.Web;
 //using MYOB.AccountRight.SDK;
 //using MYOB.AccountRight.SDK.Contracts;
 using Newtonsoft.Json;
+using System.Web.Configuration;
 
 namespace HonorITDemo.Helpers
 {
@@ -50,6 +51,37 @@ namespace HonorITDemo.Helpers
         public string RefreshToken { get; set; }
         public string TokenType { get; set; }
         public string Scope { get; set; }
+    }
+
+    public static class OAuthKeyService
+    {
+        public static OAuthInfo OAuthInformation
+        {
+            get
+            {
+                var info = HttpContextFactory.Current.Session["OAuthInfo"] as OAuthInfo;
+
+                if (info == null)
+                {
+                    info = new OAuthInfo
+                    {
+                        AuthorizationUrl = WebConfigurationManager.AppSettings["authorizationUrl"],
+                        Key = WebConfigurationManager.AppSettings["clientId"],
+                        TokenUrl = WebConfigurationManager.AppSettings["tokenUrl"],
+                        Secret = WebConfigurationManager.AppSettings["clientSecret"],
+                        RedirectUri = WebConfigurationManager.AppSettings["redirectUrl"],
+                        Scope = WebConfigurationManager.AppSettings["scope"]
+                    };
+
+                    HttpContextFactory.Current.Session["OAuthInfo"] = info;
+                }
+                return info;
+            }
+            set
+            {
+                HttpContextFactory.Current.Session["OAuthInfo"] = value;
+            }
+        }
     }
 
     //public class OAuthKeyService : IOAuthKeyService

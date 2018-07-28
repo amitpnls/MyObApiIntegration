@@ -6,14 +6,16 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Script.Serialization;
 
 namespace HonorITDemo.Helpers
 {
-    public class AccountRightService
+    public class AccountRightService: IAccountRightService
     {
         string apiBaseUrl = WebConfigurationManager.AppSettings["authorizationUrl"];
         string client_id = WebConfigurationManager.AppSettings["clientId"];
@@ -89,6 +91,7 @@ namespace HonorITDemo.Helpers
 
             //currently using first supplier from list,and assign that supplier to all purchase order.
             var supplier = supplierinfo.Items.FirstOrDefault();
+
 
             foreach (var quote in quotes.Items)
             {
@@ -223,5 +226,28 @@ namespace HonorITDemo.Helpers
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(credentials);
             return System.Convert.ToBase64String(plainTextBytes);
         }
+
+
+
+        ////checkcode
+        //public void GetDetails()
+        //{
+
+        //    var access_code = OAuthServiceHelper.OAuthInformation.Token.AccessToken.ToString();
+        //    string url = "https://api.myob.com/accountright/";
+
+        //    HttpClient httpClient = new HttpClient();
+        //    httpClient.DefaultRequestHeaders.Clear();
+        //    access_code = $"Bearer {access_code}";
+        //    httpClient.DefaultRequestHeaders.Add("Authorization", access_code);
+        //    httpClient.DefaultRequestHeaders.Add("x-myobapi-key", client_id);
+        //    httpClient.DefaultRequestHeaders.Add("x-myobapi-version", "v2");
+
+        //    var content = new StringContent("");
+
+        //    var responseTask = httpClient.GetAsync(url);
+
+        //    Task.WaitAll(responseTask); // Error Occurs Here
+        //}
     }
 }
