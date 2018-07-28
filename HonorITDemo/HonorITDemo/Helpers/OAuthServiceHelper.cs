@@ -22,37 +22,7 @@ namespace HonorITDemo.Helpers
 
             HttpContextFactory.Current.Response.Redirect(authorizationUri);
         }
-
-        public static void RequestAccessToken(this OAuthInfo info)
-        {
-            var requestUri = HttpContextFactory.Current.Request.Url;
-            var queries = HttpUtility.ParseQueryString(requestUri.Query);
-            var code = queries["code"];
-
-            if (string.IsNullOrEmpty(code))
-            {
-                info.Token = new OAuthToken
-                {
-                    AccessToken = requestUri.Query.TrimStart('?')
-                };
-                return;
-            }
-            var accessTokenBody = string.Format("client_id={0}&client_secret={1}&scope={2}&code={3}&redirect_uri={4}&grant_type=authorization_code",
-            info.Key, info.Secret, info.Scope, code, info.RedirectUri);
-
-            var reply = DoPost(info.TokenUrl, accessTokenBody);
-            var tokenJson = JsonConvert.DeserializeObject<dynamic>(reply);
-
-            info.Token = new OAuthToken
-            {
-                AccessToken = tokenJson.access_token,
-                RefreshToken = tokenJson.refresh_token,
-                ExpiresIn = tokenJson.expires_in,
-                Scope = tokenJson.scope,
-                TokenType = tokenJson.token_type
-            };
-        }
-
+      
         //Custom request Access 
         public static OAuthToken GetAccessToken(OAuthInfo info = null,string code="")
         {
@@ -74,26 +44,7 @@ namespace HonorITDemo.Helpers
 
             return info.Token;
         }
-
-        public static OAuthToken RefreshToken(this OAuthInfo info)
-        {
-            var accessTokenBody = string.Format("client_id={0}&client_secret={1}&refresh_token={2}&grant_type=refresh_token",
-            info.Key, info.Secret, info.RefreshToken);
-
-            var reply = DoPost(info.TokenUrl, accessTokenBody);
-            var tokenJson = JsonConvert.DeserializeObject<dynamic>(reply);
-
-            info.Token = new OAuthToken
-            {
-                AccessToken = tokenJson.access_token,
-                RefreshToken = tokenJson.refresh_token,
-                ExpiresIn = tokenJson.expires_in,
-                Scope = tokenJson.scope,
-                TokenType = tokenJson.token_type
-            };
-
-            return info.Token;
-        }
+       
         private static string DoPost(string url, string body)
         {
             var request = (HttpWebRequest)WebRequest.Create(url);
@@ -123,5 +74,55 @@ namespace HonorITDemo.Helpers
                 }
             }
         }
+
+        //public static void RequestAccessToken(this OAuthInfo info)
+        //{
+        //    var requestUri = HttpContextFactory.Current.Request.Url;
+        //    var queries = HttpUtility.ParseQueryString(requestUri.Query);
+        //    var code = queries["code"];
+
+        //    if (string.IsNullOrEmpty(code))
+        //    {
+        //        info.Token = new OAuthToken
+        //        {
+        //            AccessToken = requestUri.Query.TrimStart('?')
+        //        };
+        //        return;
+        //    }
+        //    var accessTokenBody = string.Format("client_id={0}&client_secret={1}&scope={2}&code={3}&redirect_uri={4}&grant_type=authorization_code",
+        //    info.Key, info.Secret, info.Scope, code, info.RedirectUri);
+
+        //    var reply = DoPost(info.TokenUrl, accessTokenBody);
+        //    var tokenJson = JsonConvert.DeserializeObject<dynamic>(reply);
+
+        //    info.Token = new OAuthToken
+        //    {
+        //        AccessToken = tokenJson.access_token,
+        //        RefreshToken = tokenJson.refresh_token,
+        //        ExpiresIn = tokenJson.expires_in,
+        //        Scope = tokenJson.scope,
+        //        TokenType = tokenJson.token_type
+        //    };
+        //}
+
+        //public static OAuthToken RefreshToken(this OAuthInfo info)
+        //{
+        //    var accessTokenBody = string.Format("client_id={0}&client_secret={1}&refresh_token={2}&grant_type=refresh_token",
+        //    info.Key, info.Secret, info.RefreshToken);
+
+        //    var reply = DoPost(info.TokenUrl, accessTokenBody);
+        //    var tokenJson = JsonConvert.DeserializeObject<dynamic>(reply);
+
+        //    info.Token = new OAuthToken
+        //    {
+        //        AccessToken = tokenJson.access_token,
+        //        RefreshToken = tokenJson.refresh_token,
+        //        ExpiresIn = tokenJson.expires_in,
+        //        Scope = tokenJson.scope,
+        //        TokenType = tokenJson.token_type
+        //    };
+
+        //    return info.Token;
+        //}
     }
 }

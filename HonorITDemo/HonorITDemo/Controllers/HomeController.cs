@@ -1,13 +1,7 @@
-﻿using System;
-using System.Configuration;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Web;
+﻿using System.Web;
 using System.Web.Mvc;
 using HonorITDemo.Helpers;
 using HonorITDemo.Models;
-using Newtonsoft.Json;
 using System.Web.Configuration;
 
 namespace HonorITDemo.Controllers
@@ -23,16 +17,11 @@ namespace HonorITDemo.Controllers
 
         public ActionResult Index()
         {
-
-            return View();
-        }
-
-        public ActionResult Quotes()
-        {
             CallOAuthAuthentication();
 
             return View();
         }
+       
 
         [HttpGet]
         public ActionResult QuoteList()
@@ -96,6 +85,7 @@ namespace HonorITDemo.Controllers
             }
 
             string MYOBToken = OAuthInformation.Token.AccessToken;
+
             AccountRightService service = new AccountRightService();
 
             PurchaseOrderModel rootobj = service.GetPurchaseOrderListAR(MYOBToken);
@@ -143,12 +133,7 @@ namespace HonorITDemo.Controllers
             return RedirectToAction("QuoteList", "Home");
         }
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-       
-            return View();
-        }
+    
         public OAuthInfo OAuthInformation
         {
             get
@@ -159,12 +144,12 @@ namespace HonorITDemo.Controllers
                 {
                     info = new OAuthInfo
                     {
-                        AuthorizationUrl = ConfigurationManager.AppSettings["authorizationUrl"],
-                        Key = ConfigurationManager.AppSettings["clientId"],
-                        TokenUrl = ConfigurationManager.AppSettings["tokenUrl"],
-                        Secret = ConfigurationManager.AppSettings["clientSecret"],
-                        RedirectUri = ConfigurationManager.AppSettings["redirectUrl"],
-                        Scope = ConfigurationManager.AppSettings["scope"]
+                        AuthorizationUrl = apiBaseUrl,
+                        Key = client_id,
+                        TokenUrl = tokenUrl,
+                        Secret = client_secret,
+                        RedirectUri = redirect_uri,
+                        Scope = scope
                     };
 
                     HttpContextFactory.Current.Session["OAuthInfo"] = info;
@@ -177,12 +162,17 @@ namespace HonorITDemo.Controllers
             }
         }
 
+        public ActionResult About()
+        {
+            ViewBag.Message = "Your application description page.";
+
+            return View();
+        }
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
 
             return View();
         }
-
     }
 }

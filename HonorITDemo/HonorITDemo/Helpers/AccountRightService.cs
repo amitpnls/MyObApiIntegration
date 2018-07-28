@@ -27,6 +27,7 @@ namespace HonorITDemo.Helpers
         string companyUID = WebConfigurationManager.AppSettings["companyUID"];
 
       
+        //This Will return Quots List from api,If quotes is empty it will return null.
         public QuotesModel GetQuoteList(string MYOBToken)
         {
             QuotesModel quotes = new QuotesModel();
@@ -39,6 +40,7 @@ namespace HonorITDemo.Helpers
                 {
                     return quotes;
                 }
+                //Convert quotes json string into Quotes Model class
                 quotes = Newtonsoft.Json.JsonConvert.DeserializeObject<QuotesModel>(jsonResponseString);
 
               return quotes;
@@ -47,10 +49,9 @@ namespace HonorITDemo.Helpers
             {
                 throw ex;
             }
-            // return quotes;
         }
 
-        //Get Purchase order List for Account Rights Api.
+        //This Will return Purchsae order list from api,If purchsae order is empty it will return null.
         public PurchaseOrderModel GetPurchaseOrderListAR(string MYOBToken)
         {
             PurchaseOrderModel rootobj = new PurchaseOrderModel();
@@ -64,6 +65,8 @@ namespace HonorITDemo.Helpers
                 {
                     return rootobj;
                 }
+
+                //Convert purchase order json string into PurchaseOrderModel class
                 rootobj = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseOrderModel>(jsonResponseString);
             }
             catch (Exception ex)
@@ -73,11 +76,18 @@ namespace HonorITDemo.Helpers
             return rootobj;
         }
 
-        //Create Purchase Order from QuotesJson Account right api 
+        //Create Purchase order from QuotesJson Account right api 
         public void CreatePurchaseOrderFromQuotes(QuotesModel quotes,string MYOBToken)
         {
             //Get Supplier Detail
             SupplierModel supplierinfo = GetSupplierListAR(MYOBToken);
+
+            if (supplierinfo == null)
+            {
+                return;
+            }
+
+            //currently using first supplier from list,and assign that supplier to all purchase order.
             var supplier = supplierinfo.Items.FirstOrDefault();
 
             foreach (var quote in quotes.Items)
@@ -110,15 +120,14 @@ namespace HonorITDemo.Helpers
                 purchaseStream.Write(pbytes, 0, pbytes.Length);
 
                 HttpWebResponse webresponse = (HttpWebResponse)purchaserequest.GetResponse();
-                string returnresponse = webresponse.StatusCode.ToString();
 
                 purchaseStream = webresponse.GetResponseStream();
                 StreamReader reader = new StreamReader(purchaseStream);
                 string responseServer = reader.ReadToEnd();
+
                 reader.Close();
                 purchaseStream.Close();
                 webresponse.Close();
-
               }
               catch (Exception e)
               {
@@ -127,7 +136,7 @@ namespace HonorITDemo.Helpers
             }
         }
 
-        //Delete Purchase Order Account right api 
+        //Delete Purchase Order 
         public void DeletePurchaseOrder(PurchaseOrderModel purchaseorder, string MYOBToken)
         {
             foreach (var purchase in purchaseorder.Items)
@@ -161,7 +170,7 @@ namespace HonorITDemo.Helpers
             }
         }
 
-        //Get Supplier List
+        //This Will return Supplier list from api,If supplier is empty it will return null.
         public SupplierModel GetSupplierListAR(string MYOBToken)
         {
             string bURL = string.Format("{0}{1}/Contact/Supplier", baseUrl, companyUID);
@@ -169,6 +178,7 @@ namespace HonorITDemo.Helpers
 
             try
             {
+
                 string jsonResponseString = WebApiGetRequest(bURL, MYOBToken);
 
                 if (jsonResponseString.Contains("\"Count\": null"))
@@ -183,7 +193,6 @@ namespace HonorITDemo.Helpers
             {
                 throw ex;
             }
-            return rootobj;
         }
 
         //Get WebApi Response
