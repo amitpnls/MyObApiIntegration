@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2002
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HonorITDemo", "HonorITDemo\HonorITDemo.csproj", "{9AE1313E-3D1D-4052-BA19-C84DF9E2FC34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Honor.IT.Api", "Honor.IT.Api\Honor.IT.Api.csproj", "{2D70E9B3-996C-428B-AA05-15BE3EE876FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9AE1313E-3D1D-4052-BA19-C84DF9E2FC34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AE1313E-3D1D-4052-BA19-C84DF9E2FC34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AE1313E-3D1D-4052-BA19-C84DF9E2FC34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AE1313E-3D1D-4052-BA19-C84DF9E2FC34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D70E9B3-996C-428B-AA05-15BE3EE876FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D70E9B3-996C-428B-AA05-15BE3EE876FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D70E9B3-996C-428B-AA05-15BE3EE876FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D70E9B3-996C-428B-AA05-15BE3EE876FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {97F53743-C26B-4BAD-B36A-AA366F2E09E3}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,68 @@
+﻿@{
+    ViewBag.Title = "Invoice list";
+}
+@using Xero.Api.Core.Model;
+
+<div class="row">
+    <table class="table table-bordered table-condensed table-hover table-striped" id="invoices">
+        <thead>
+            <tr>
+                <th class="text-center">Name</th>
+                <th class="text-center">Date</th>
+                <th class="text-center">Due Date</th>
+                <th class="text-center">Number</th>
+                <th class="text-center">SubTotal</th>
+                <th class="text-center">Total</th>
+                <th class="text-center">Pdf</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                string path = Server.MapPath("~/Pdf/");
+            }
+            @foreach (var invoice in (List<Invoice>)ViewBag.InvoiceListData)
+            {
+                <tr>
+                    <td class="text-right" style="background-color:#dddddd">@invoice.Contact.Name</td>
+                    <td class="text-right" style="background-color:#dddddd"> @invoice.Date.Value.ToString("dd-MM-yyyy")</td>
+                    <td class="text-right" style="background-color:#dddddd">@invoice.DueDate.Value.ToString("dd-MM-yyyy")</td>
+                    <td class="text-right" style="background-color:#dddddd">@invoice.Number</td>
+                    <td class="text-right" style="background-color:#dddddd">@invoice.SubTotal</td>
+                    <td class="text-right" style="background-color:#dddddd">@invoice.Total</td>
+                    <td style="background-color:#dddddd"> @Html.ActionLink("Download", "Download", "Home", new { fileName = @invoice.Id, foldername = "Invoice" }, null) </td>
+                    @*<a href="#" class="btn btn-info btn-lg">
+                            <span class="glyphicon glyphicon-file"></span> File
+                        </a>*@
+                </tr>
+                <tr>
+                    <th class="text-center">Sr no.</th>
+                    <th class="text-center">Item code</th>
+                    <th class="text-center">Description</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-center">Unit amount</th>
+                    <th class="text-center">Total amount</th>
+                </tr>
+
+                int no = 1;
+                foreach (var lineitem in invoice.LineItems)
+                {
+                     <tr>
+                         <td class="text-right" style="background-color:#f9f9f9"><em>@no</em></td>
+                         <td class="text-right" style="background-color:#f9f9f9"><em>@lineitem.ItemCode</em></td>
+                         <td class="text-right" style="background-color:#f9f9f9"><em>@lineitem.Description</em></td>
+                         <td class="text-right" style="background-color:#f9f9f9"><em>@lineitem.Quantity</em></td>
+                         <td class="text-right" style="background-color:#f9f9f9"><em>@lineitem.UnitAmount</em></td>
+                         <td class="text-right" style="background-color:#f9f9f9"><em>@lineitem.LineAmount</em></td>
+                     </tr>
+                         no++;
+                     }
+                 }
+        </tbody>
+    </table>
+</div>
+
+<script>
+   $(document).ready(function () {
+       $('#invoices').DataTable();
+   });
+</script>

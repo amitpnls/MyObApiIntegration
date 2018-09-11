@@ -42,7 +42,7 @@ namespace HonorITDemo.Models
         public List<Line> Lines { get; set; }
         public bool IsReportable { get; set; }
         public double Subtotal { get; set; }
-        public double Freight { get; set; }
+        public double? Freight { get; set; }
         public FreightTaxCode FreightTaxCode { get; set; }
         public double TotalTax { get; set; }
         public double TotalAmount { get; set; }

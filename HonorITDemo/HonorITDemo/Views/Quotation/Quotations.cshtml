@@ -1,0 +1,50 @@
+﻿@model HonorITDemo.Models.QuotesModel
+@{
+    ViewBag.Title = "Quotation List";
+    var quotatioinModel = Model;
+}
+
+@using (Html.BeginForm("Quotations", "Quotation", new { @class = "form-horizontal", role = "form" }))
+{
+    <h2>Quotations list</h2>
+
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Invoice number</th>
+                <th>Customer Name</th>
+                <th>Total Amount</th>
+                <th>Due amount</th>
+                <th>Due Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Items != null)
+                {
+                    if (Model.Items.Count != 0)
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                        <tr>
+                            <td align="left">@item.Date.ToString("M-dd-yyyy")</td>
+                            <td align="left">@item.Number</td>
+                            <td align="left">@item.Customer.Name</td>
+                            <td align="right">@string.Format("{0:C}", item.TotalAmount)</td>
+                            <td align="right">@string.Format("{0:C}", item.BalanceDueAmount)</td>
+                            <td align="left">@item.Terms.DueDate.ToString("MM-dd-yyyy")</td>
+                        </tr>
+                    }
+                }
+            }
+
+        </tbody>
+    </table>
+    @Html.ActionLink("Generate purchase order", "CreatePurchaseOrderAR", "Home", new { @class = "btn btn-primary" })
+}
+
+<script>
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+</script>

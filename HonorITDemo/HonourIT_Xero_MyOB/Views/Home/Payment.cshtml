@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "Payment list";
+}
+@using Xero.Api.Core.Model;
+
+<div class="row">
+    <table class="table table-bordered table-condensed table-hover table-striped" id="payment">
+        <thead>
+            <tr>
+                <th class="text-center">Date</th>
+                <th class="text-center">Number</th>
+                <th class="text-center">Contact name</th>
+                <th class="text-center">Amount</th>
+                <th class="text-center">Bank amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var payment in (List<Payment>)ViewBag.PaymentData)
+            {
+                <tr>
+                    <td class="text-right" style="background-color:#f9f9f9">@payment.Date.ToString("dd-MM-yyyy")</td>
+                    <td class="text-right" style="background-color:#f9f9f9">@payment.Invoice.Number</td>
+                    <td class="text-right" style="background-color:#f9f9f9">@payment.Invoice.Contact.Name</td>
+                    <td class="text-right" style="background-color:#f9f9f9">@payment.Amount</td>
+                    <td class="text-right" style="background-color:#f9f9f9">@payment.BankAmount</td>
+                 </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script>
+   $(document).ready(function () {
+       $('#payment').DataTable();
+   });
+</script>

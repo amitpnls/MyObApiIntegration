@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
-using System.Web.Script.Serialization;
 
 namespace HonorITDemo.Helpers
 {
@@ -49,7 +48,8 @@ namespace HonorITDemo.Helpers
             }
             catch (Exception ex)
             {
-                throw ex;
+                return quotes;
+               // throw ex;
             }
         }
 
