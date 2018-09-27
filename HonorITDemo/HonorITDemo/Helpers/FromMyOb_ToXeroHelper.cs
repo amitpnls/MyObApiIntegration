@@ -89,9 +89,7 @@ namespace HonorITDemo.Helpers
                 {
                     //var receiptresponse= CreateMyObReceiveMoneyFromXeroPayment(myob_invoice_item, paymentResponse, MYOBToken);
                     var receiptresponse = CreateMyObCustomerPayment(myob_invoice_item, paymentResponse, MYOBToken);
-                    
                 }
-
                 //Recept
                 //Receipt receipt = CreateXeroReceiptFromPayment(private_app_api, InvoiceResponse.Id);
             }
@@ -128,91 +126,91 @@ namespace HonorITDemo.Helpers
         }
 
         //Create Receipt in myob,using from xero payment and myob invoice info.(Banking/ReceiveMoneyTxn)
-        public ReceiveMoneyMyOb CreateMyObReceiveMoneyFromXeroPayment(InvoiceItemModel invoice_myob, Payment payment_xero, string MYOBToken)
-        {
-            ReceiveMoneyMyOb receivepayment = new ReceiveMoneyMyOb();
+        //public ReceiveMoneyMyOb CreateMyObReceiveMoneyFromXeroPayment(InvoiceItemModel invoice_myob, Payment payment_xero, string MYOBToken)
+        //{
+        //    ReceiveMoneyMyOb receivepayment = new ReceiveMoneyMyOb();
 
-            try
-            {
-                AccountRightService accountright = new AccountRightService();
-                string accountrequesturl = "https://ar1.api.myob.com/accountright/3e5400ea-9ba2-4acc-acef-b93e5f8364ef/GeneralLedger/Account/720e0fcc-fcf1-416d-9a69-7353b0079811";
+        //    try
+        //    {
+        //        AccountRightService accountright = new AccountRightService();
+        //        string accountrequesturl = "https://ar1.api.myob.com/accountright/3e5400ea-9ba2-4acc-acef-b93e5f8364ef/GeneralLedger/Account/720e0fcc-fcf1-416d-9a69-7353b0079811";
 
-                //Get Account details from webapi.
-                string accountresponse = accountright.WebApiGetRequest(accountrequesturl, MYOBToken);
+        //        //Get Account details from webapi.
+        //        string accountresponse = accountright.WebApiGetRequest(accountrequesturl, MYOBToken);
 
-                AccountReceiptMyOb AccountSerialized = Newtonsoft.Json.JsonConvert.DeserializeObject<AccountReceiptMyOb>(accountresponse);
-                receivepayment.Account = new AccountReceiveMoney();
-                receivepayment.Account.UID = AccountSerialized.UID;
-                //receivepayment.Account.DisplayID = AccountSerialized.DisplayID;
-                //receivepayment.Account.Name = AccountSerialized.Name;
-                //receivepayment.Account.URI = AccountSerialized.URI;
+        //        AccountReceiptMyOb AccountSerialized = Newtonsoft.Json.JsonConvert.DeserializeObject<AccountReceiptMyOb>(accountresponse);
+        //        receivepayment.Account = new AccountReceiveMoney();
+        //        receivepayment.Account.UID = AccountSerialized.UID;
+        //        //receivepayment.Account.DisplayID = AccountSerialized.DisplayID;
+        //        //receivepayment.Account.Name = AccountSerialized.Name;
+        //        //receivepayment.Account.URI = AccountSerialized.URI;
 
-                //receivepayment.AmountReceived = (double)payment_xero.Amount;
+        //        //receivepayment.AmountReceived = (double)payment_xero.Amount;
 
-                receivepayment.DepositTo = "Account";
-                receivepayment.Memo = "Payment: "+ invoice_myob.Customer.Name;
+        //        receivepayment.DepositTo = "Account";
+        //        receivepayment.Memo = "Payment: "+ invoice_myob.Customer.Name;
 
-                receivepayment.Contact = new ContactReceiveMoney();
-                receivepayment.Contact.UID = invoice_myob.Customer.UID;
-                //receivepayment.Contact.DisplayID = invoice_myob.Customer.DisplayID;
-                //receivepayment.Contact.Name = invoice_myob.Customer.Name;
-                //receivepayment.Contact.URI = invoice_myob.Customer.URI;
+        //        receivepayment.Contact = new ContactReceiveMoney();
+        //        receivepayment.Contact.UID = invoice_myob.Customer.UID;
+        //        //receivepayment.Contact.DisplayID = invoice_myob.Customer.DisplayID;
+        //        //receivepayment.Contact.Name = invoice_myob.Customer.Name;
+        //        //receivepayment.Contact.URI = invoice_myob.Customer.URI;
 
-                receivepayment.Date = payment_xero.Date;
+        //        receivepayment.Date = payment_xero.Date;
 
-                receivepayment.Lines = new List<LineReceiveMoney>();
-                LineReceiveMoney linereceive = new LineReceiveMoney();
-                linereceive.TaxCode = new TaxCodeReceiveMoney();
-                linereceive.Account = new AccountReceiveMoney();
+        //        receivepayment.Lines = new List<LineReceiveMoney>();
+        //        LineReceiveMoney linereceive = new LineReceiveMoney();
+        //        linereceive.TaxCode = new TaxCodeReceiveMoney();
+        //        linereceive.Account = new AccountReceiveMoney();
 
-                foreach (var invoiceline in invoice_myob.Lines)
-                {
-                    linereceive.Account.UID = AccountSerialized.UID;
-                    linereceive.TaxCode.UID = "b0613ff1-eabe-4aed-9d35-ec7f66e1aac1";
-                    linereceive.Amount = invoiceline.Total;
+        //        foreach (var invoiceline in invoice_myob.Lines)
+        //        {
+        //            linereceive.Account.UID = AccountSerialized.UID;
+        //            linereceive.TaxCode.UID = "b0613ff1-eabe-4aed-9d35-ec7f66e1aac1";
+        //            linereceive.Amount = invoiceline.Total;
                     
-                    //linereceive.RowID = invoiceline.RowID;
-                    //linereceive.Job = invoiceline.Job;
-                    //linereceive.TaxCode.Code = "GST";
-                    //linereceive.TaxCode.UID = "3bd2fbea-54d7-4115-8030-b84360048465";
+        //            //linereceive.RowID = invoiceline.RowID;
+        //            //linereceive.Job = invoiceline.Job;
+        //            //linereceive.TaxCode.Code = "GST";
+        //            //linereceive.TaxCode.UID = "3bd2fbea-54d7-4115-8030-b84360048465";
 
-                    receivepayment.Lines.Add(linereceive);
-                }
+        //            receivepayment.Lines.Add(linereceive);
+        //        }
                 
-                string ReceivePaymentSerialized = JsonConvert.SerializeObject(receivepayment);
-                byte[] pbytes = Encoding.UTF8.GetBytes(ReceivePaymentSerialized);
+        //        string ReceivePaymentSerialized = JsonConvert.SerializeObject(receivepayment);
+        //        byte[] pbytes = Encoding.UTF8.GetBytes(ReceivePaymentSerialized);
 
-                string bURL = string.Format("{0}{1}/Banking/ReceiveMoneyTxn", baseUrl, companyUID);
+        //        string bURL = string.Format("{0}{1}/Banking/ReceiveMoneyTxn", baseUrl, companyUID);
 
-                HttpWebRequest paymentrequest = (HttpWebRequest)HttpWebRequest.Create(bURL);
-                paymentrequest.Method = "POST";
-                paymentrequest.Headers.Add("Authorization", "Bearer " + MYOBToken);
-                paymentrequest.Headers.Add("x-myobapi-cftoken", Base64Encode(username, password));
-                paymentrequest.Headers.Add("x-myobapi-key", client_id);
-                paymentrequest.Headers.Add("x-myobapi-version", "v2");
-                paymentrequest.Accept = "application/json";
-                paymentrequest.ContentType = "application/json";
-                paymentrequest.ContentLength = pbytes.Length;
+        //        HttpWebRequest paymentrequest = (HttpWebRequest)HttpWebRequest.Create(bURL);
+        //        paymentrequest.Method = "POST";
+        //        paymentrequest.Headers.Add("Authorization", "Bearer " + MYOBToken);
+        //        paymentrequest.Headers.Add("x-myobapi-cftoken", Base64Encode(username, password));
+        //        paymentrequest.Headers.Add("x-myobapi-key", client_id);
+        //        paymentrequest.Headers.Add("x-myobapi-version", "v2");
+        //        paymentrequest.Accept = "application/json";
+        //        paymentrequest.ContentType = "application/json";
+        //        paymentrequest.ContentLength = pbytes.Length;
 
-                Stream paymentStream = paymentrequest.GetRequestStream();
-                paymentStream.Write(pbytes, 0, pbytes.Length);
+        //        Stream paymentStream = paymentrequest.GetRequestStream();
+        //        paymentStream.Write(pbytes, 0, pbytes.Length);
 
-                HttpWebResponse webresponse = (HttpWebResponse)paymentrequest.GetResponse();
+        //        HttpWebResponse webresponse = (HttpWebResponse)paymentrequest.GetResponse();
 
-                paymentStream = webresponse.GetResponseStream();
-                StreamReader reader = new StreamReader(paymentStream);
-                string responseServer = reader.ReadToEnd();
+        //        paymentStream = webresponse.GetResponseStream();
+        //        StreamReader reader = new StreamReader(paymentStream);
+        //        string responseServer = reader.ReadToEnd();
 
-                reader.Close();
-                paymentStream.Close();
-                webresponse.Close();
-            }
-            catch (Exception e)
-            {
-                return receivepayment;
-            }
-            return receivepayment;
-        }
+        //        reader.Close();
+        //        paymentStream.Close();
+        //        webresponse.Close();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return receivepayment;
+        //    }
+        //    return receivepayment;
+        //}
         
         
         //Create Myob Customer Payment on Generated Invoice. 

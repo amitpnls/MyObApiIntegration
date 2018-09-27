@@ -252,7 +252,6 @@
     <Compile Include="Models\InvoiceModel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\MyObCustomerPayment.cs" />
-    <Compile Include="Models\ReceiveMoneyListModel.cs" />
     <Compile Include="Models\ReceiveMoneyMyOb.cs" />
     <Compile Include="Models\SupplierModel.cs" />
     <Compile Include="Models\QuotesModel.cs" />

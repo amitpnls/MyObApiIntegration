@@ -29,7 +29,6 @@ namespace HonorITDemo.Helpers
         InvoiceItemModel GetSalesOrderInvoiceById(string MYOBToken,string invoiceid);
 
         //Get Receipt
-        //ReceiveMoneyListModel GetReceiptList(string MYOBToken);
         MyObCustomerPayment GetReceiptList(string MYOBToken);
     }
 }
