@@ -23,5 +23,13 @@ namespace HonorITDemo.Helpers
 
         string Base64Encode(string username, string password = "");
 
+        //Return  all sales Invoice list
+        InvoiceModel GetSalesOrderInvoiceListAR(string MYOBToken);
+        //Return single sales invoice by invoice Id
+        InvoiceItemModel GetSalesOrderInvoiceById(string MYOBToken,string invoiceid);
+
+        //Get Receipt
+        //ReceiveMoneyListModel GetReceiptList(string MYOBToken);
+        MyObCustomerPayment GetReceiptList(string MYOBToken);
     }
 }

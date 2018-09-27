@@ -1,0 +1,62 @@
+﻿@model HonorITDemo.Models.InvoiceModel
+
+<h2>Invoice list</h2>
+<h4>Total Count: @Model.Items.Count</h4>
+
+@using (Html.BeginForm("Invoices", "Invoice", FormMethod.Post))
+{
+    @Html.HiddenFor(x=>x.InvoiceCheckedIds, new {id= "InvoiceCheckedIds" })
+<table id="example" class="table table-bitemed table-condensed table-hover table-striped">
+    <thead>
+        <tr>
+            <th>Select</th>
+            <th>Inv. Number</th>
+            <th>Date</th>
+            <th>Promised date</th>
+            <th>Customer name</th>
+            <th>Subtotal</th>
+            <th>Freight</th>
+            <th>TotalAmount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Items != null)
+        {
+            if (Model.Items.Count != 0)
+            {
+                foreach (var item in Model.Items.Where(x=>x.Status=="Open"))
+                {
+                    <tr>
+                        <td>@Html.CheckBox("InvoiceCheckBox", false,new {@value =item.UID})</td>
+                        <td align="left">@item.Number</td>
+                        <td align="left">@item.Date.ToString("MM-dd-yyyy") </td>
+                        <td align="left">@(item.PromisedDate?.ToString("yyyy-MM-dd") ?? String.Empty)</td>
+                        <td align="left">@(item.Customer.Name?.ToString() ?? String.Empty)</td>
+                        <td align="right">@string.Format("{0:C}", item.Subtotal)</td>
+                        <td align="right">@string.Format("{0:C}", item.Freight)</td>
+                        <td align="right">@string.Format("{0:C}", item.TotalAmount)</td>
+                    </tr>
+                    }
+                }
+            }
+    </tbody>
+</table>
+ <input type="submit" name="Submit" value="Submit" class="btn btn-primary" id="save_value">
+}
+<script>
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+</script>
+<script>
+        $(function () {
+            $('#save_value').click(function () {
+                var selectedInvoiceIds = "";
+                var comma = ",";
+                $(':checkbox:checked').each(function (i) {
+                    selectedInvoiceIds += $(this).val() + comma;
+                });
+                $("#InvoiceCheckedIds").val(selectedInvoiceIds);
+            });
+        });
+</script>

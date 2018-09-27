@@ -10,6 +10,8 @@ using Xero.Api.Core.Model;
 using Xero.Api.Serialization;
 using Xero.Api.Example.Applications.Private;
 using Xero.Api.Infrastructure.OAuth;
+using System;
+using Xero.Api.Core.Model.Types;
 
 namespace HonourIT_Xero_MyOB.Controllers
 {
@@ -26,8 +28,8 @@ namespace HonourIT_Xero_MyOB.Controllers
         {
             //Authentication code 
             X509Certificate2 cert = new X509Certificate2(SigningCertificatePath, SigningCertificatePassword);
-             private_app_api = new XeroCoreApi(BaseUrl, new PrivateAuthenticator(cert), new Consumer(ConsumerKey, ConsumerSecret), null
-            , new DefaultMapper(), new DefaultMapper());
+            private_app_api = new XeroCoreApi(BaseUrl, new PrivateAuthenticator(cert), new Consumer(ConsumerKey, ConsumerSecret), null
+           , new DefaultMapper(), new DefaultMapper());
         }
 
         #region Invoice list
@@ -38,7 +40,7 @@ namespace HonourIT_Xero_MyOB.Controllers
 
             return View();
         }
-       
+
         //return all invoice list
         public List<Invoice> GetAllInvoiceBill(XeroCoreApi private_app_api)
         {
@@ -49,7 +51,7 @@ namespace HonourIT_Xero_MyOB.Controllers
                 //Guid invoiceId = invoice.Id;
                 //Invoice invoice = private_app_api.Invoices.Find(invoiceId);
                 Xero.Api.Core.File.BinaryFile pdfFile = private_app_api.PdfFiles.Get(Xero.Api.Core.Model.Types.PdfEndpointType.Invoices, invoice.Id);
-                string _path = System.IO.Path.Combine(Server.MapPath("~/Pdf/Invoice"), invoice.Id+ ".pdf");
+                string _path = System.IO.Path.Combine(Server.MapPath("~/Pdf/Invoice"), invoice.Id + ".pdf");
                 pdfFile.Save(_path);
             }
 
@@ -123,6 +125,9 @@ namespace HonourIT_Xero_MyOB.Controllers
         {
             ViewBag.Message = "Your application description page.";
 
+           
+           // CreateXeroInvoice(private_app_api);
+            //CreateAccount(private_app_api);
             return View();
         }
         public ActionResult About()
@@ -137,6 +142,121 @@ namespace HonourIT_Xero_MyOB.Controllers
 
             return View();
         }
+
+        //Create Xero Invoice 
+        public void CreateXeroInvoice(XeroCoreApi private_app_api)
+        {
+            Invoice inv = new Invoice();
+            inv.Contact = new Contact();
+
+            Contact contact = private_app_api.Contacts.Find().ToList().Where(c => c.EmailAddress == "avanimehta@gmail.com").FirstOrDefault();
+            inv.Contact.Name = contact.Name;
+            inv.CurrencyCode = inv.Contact.DefaultCurrency;
+
+            inv.Type = InvoiceType.AccountsPayable;
+            inv.Date = DateTime.Now;
+            inv.DueDate = DateTime.Now.AddDays(5);
+            inv.Status = Xero.Api.Core.Model.Status.InvoiceStatus.Authorised;
+
+            inv.LineAmountTypes = new LineAmountType();
+            inv.LineAmountTypes = LineAmountType.Exclusive;
+
+            inv.LineItems = new List<LineItem>();
+            LineItem li = new LineItem();
+            li.Description = "Webdev inv test";
+            li.Quantity = Convert.ToDecimal("1.0000");
+            li.UnitAmount = Convert.ToDecimal("75.00");
+            li.AccountCode = "200";
+            //li.LineAmount = Convert.ToDecimal("200.00");
+            //li.ItemCode = "WEBDEVPROJ";
+
+            inv.LineItems.Add(li);
+
+            Invoice InvoiceResponse = private_app_api.Invoices.Create(inv);
+
+            //Payment
+            Payment paymentdata = CreatePayment(private_app_api, InvoiceResponse.Id);
+        }
+
+        public Payment CreatePayment(XeroCoreApi private_app_api, Guid invoiceid)
+        {
+            //var invoice = Given_an_invoice(invoiceAmount, Account.Code);
+            //var bankCode = BankAccount.Code;
+            //Guid invoiceid = new Guid("2d3e4fe1-369d-472e-b767-6055c80376cb");
+            Invoice invoiceById = private_app_api.Invoices.Find().Where(x => x.Id == invoiceid).First();
+
+            Account account = private_app_api.Accounts.Find().ToList().Where(c => c.Name == "Arun Test Bank").FirstOrDefault();
+
+            var payment = new Payment
+            {
+                Invoice = new Invoice { Number = invoiceById.Number,Id=invoiceById.Id },
+                Account = new Account { Id=account.Id, Code = account.Code},
+                Date = DateTime.Now,
+                Amount = invoiceById.AmountDue
+            };
+
+
+            try
+            {
+                Payment paymentresp = private_app_api.Payments.Create(payment);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            return null;
+        }
+
+        //Create account.
+        public void CreateAccount(XeroCoreApi private_app_api)
+        {
+            Account account = new Account();
+            Guid accountguid = Guid.NewGuid();
+           // account.Id = accountguid;
+            account.Name = "Arun Test Bank";
+            account.Status = Xero.Api.Core.Model.Status.AccountStatus.Active;
+            account.Type = AccountType.Bank;
+            account.Code = "091";
+           // account.TaxType = "NONE";
+            account.Class = AccountClassType.Asset;
+           // account.EnablePaymentsToAccount = false;
+           // account.ShowInExpenseClaims = false;
+            account.BankAccountNumber = "0963258741";
+            account.CurrencyCode = "INR";
+           // account.ReportingCode = "ASS";
+           // account.ReportingCodeName = "Assets";
+            account.HasAttachments = false;
+
+            try
+            {
+                Account accountresponse = private_app_api.Accounts.Create(account);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+
+        //<AccountID>c0ae22d3-fb9a-49ff-b9e9-979b5800b1f0</AccountID>
+        //<Name>Test Business</Name>
+        //<Status>ACTIVE</Status>
+        //<Type>BANK</Type>
+        //<TaxType>NONE</TaxType>
+        //<Class>ASSET</Class>
+        //<EnablePaymentsToAccount>false</EnablePaymentsToAccount>
+        //<ShowInExpenseClaims>false</ShowInExpenseClaims>
+        //<BankAccountNumber>1232456578987</BankAccountNumber>
+        //<BankAccountType>BANK</BankAccountType>
+        //<CurrencyCode>INR</CurrencyCode>
+        //<ReportingCode>ASS</ReportingCode>
+        //<ReportingCodeName>Assets</ReportingCodeName>
+        //<HasAttachments>false</HasAttachments>
+        //<UpdatedDateUTC>2018-08-31T12:31:51.937</UpdatedDateUTC>
+
+
+
 
         //public ActionResult CreatePurchaseOrder()
         //{

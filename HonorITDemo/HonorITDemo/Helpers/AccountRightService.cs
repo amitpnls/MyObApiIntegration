@@ -27,7 +27,6 @@ namespace HonorITDemo.Helpers
         string baseUrl = WebConfigurationManager.AppSettings["baseUrl"];
         string companyUID = WebConfigurationManager.AppSettings["companyUID"];
 
-      
         //This Will return Quots List from api,If quotes is empty it will return null.
         public QuotesModel GetQuoteList(string MYOBToken)
         {
@@ -139,40 +138,55 @@ namespace HonorITDemo.Helpers
             }
         }
 
-        //Delete Purchase Order 
-        public void DeletePurchaseOrder(PurchaseOrderModel purchaseorder, string MYOBToken)
+        //Get all sales Invoices
+        public InvoiceModel GetSalesOrderInvoiceListAR(string MYOBToken)
         {
-            foreach (var purchase in purchaseorder.Items)
+            InvoiceModel rootobj = new InvoiceModel();
+            string bURL = string.Format("{0}{1}/Sale/Invoice/Item", baseUrl, companyUID);
+
+            try
             {
-                try
+                string jsonResponseString = WebApiGetRequest(bURL, MYOBToken);
+                //convert jsonstring to json class
+                if (jsonResponseString.Contains("\"Count\": null"))
                 {
-                    string bURL = string.Format("{0}{1}/Purchase/Order/Item/{2}", baseUrl, companyUID, purchase.UID);
-
-                    HttpWebRequest purchaserequest = (HttpWebRequest)HttpWebRequest.Create(bURL);
-                    purchaserequest.Method = "DELETE";
-                    purchaserequest.Headers.Add("Authorization", "Bearer " + MYOBToken);
-                    purchaserequest.Headers.Add("x-myobapi-cftoken", Base64Encode(username, password));
-                    purchaserequest.Headers.Add("x-myobapi-key", client_id);
-                    purchaserequest.Headers.Add("x-myobapi-version", "v2");
-                    purchaserequest.Accept = "application/json";
-                    purchaserequest.ContentType = "application/json";
-
-                    HttpWebResponse webresponse = (HttpWebResponse)purchaserequest.GetResponse();
-                    string returnresponse = webresponse.StatusCode.ToString();
-
-                    using (StreamReader reader = new StreamReader(webresponse.GetResponseStream()))
-                    {
-                        returnresponse = reader.ReadToEnd();
-                    }
-                    webresponse.Close();
+                    return rootobj;
                 }
-                catch (Exception e)
-                {
-                    continue;
-                }
+
+                //Convert purchase order json string into PurchaseOrderModel class
+                rootobj = Newtonsoft.Json.JsonConvert.DeserializeObject<InvoiceModel>(jsonResponseString);
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return rootobj;
         }
 
+        //Return single sales invoice by invoice Id
+        public InvoiceItemModel GetSalesOrderInvoiceById(string MYOBToken, string invoiceid)
+        {
+            InvoiceItemModel rootobj = new InvoiceItemModel();
+            string bURL = string.Format("{0}{1}/Sale/Invoice/Item/{2}", baseUrl, companyUID, invoiceid);
+
+            try
+            {
+                string jsonResponseString = WebApiGetRequest(bURL, MYOBToken);
+                //convert jsonstring to json class
+                if (jsonResponseString.Contains("\"Count\": null"))
+                {
+                    return rootobj;
+                }
+
+                //Convert purchase order json string into PurchaseOrderModel class
+                rootobj = Newtonsoft.Json.JsonConvert.DeserializeObject<InvoiceItemModel>(jsonResponseString);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return rootobj;
+        }
         //This Will return Supplier list from api,If supplier is empty it will return null.
         public SupplierModel GetSupplierListAR(string MYOBToken)
         {
@@ -218,7 +232,66 @@ namespace HonorITDemo.Helpers
             }
             return jsonResponse;
         }
-        
+
+
+        //Delete Purchase Order 
+        public void DeletePurchaseOrder(PurchaseOrderModel purchaseorder, string MYOBToken)
+        {
+            foreach (var purchase in purchaseorder.Items)
+            {
+                try
+                {
+                    string bURL = string.Format("{0}{1}/Purchase/Order/Item/{2}", baseUrl, companyUID, purchase.UID);
+
+                    HttpWebRequest purchaserequest = (HttpWebRequest)HttpWebRequest.Create(bURL);
+                    purchaserequest.Method = "DELETE";
+                    purchaserequest.Headers.Add("Authorization", "Bearer " + MYOBToken);
+                    purchaserequest.Headers.Add("x-myobapi-cftoken", Base64Encode(username, password));
+                    purchaserequest.Headers.Add("x-myobapi-key", client_id);
+                    purchaserequest.Headers.Add("x-myobapi-version", "v2");
+                    purchaserequest.Accept = "application/json";
+                    purchaserequest.ContentType = "application/json";
+
+                    HttpWebResponse webresponse = (HttpWebResponse)purchaserequest.GetResponse();
+                    string returnresponse = webresponse.StatusCode.ToString();
+
+                    using (StreamReader reader = new StreamReader(webresponse.GetResponseStream()))
+                    {
+                        returnresponse = reader.ReadToEnd();
+                    }
+                    webresponse.Close();
+                }
+                catch (Exception e)
+                {
+                    continue;
+                }
+            }
+        }
+
+        public MyObCustomerPayment GetReceiptList(string MYOBToken)
+        {
+            string bURL = string.Format("{0}{1}/Sale/CustomerPayment", baseUrl, companyUID);
+            MyObCustomerPayment rootobj = new MyObCustomerPayment();
+
+            try
+            {
+                string jsonResponseString = WebApiGetRequest(bURL, MYOBToken);
+
+                if (jsonResponseString.Contains("\"Count\": null"))
+                {
+                    return rootobj;
+                }
+                rootobj = Newtonsoft.Json.JsonConvert.DeserializeObject<MyObCustomerPayment>(jsonResponseString);
+
+                return rootobj;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
         //Convert usercredentials into Base64Encode string 
         public string Base64Encode(string username, string password = "")
         {
@@ -227,8 +300,8 @@ namespace HonorITDemo.Helpers
             return System.Convert.ToBase64String(plainTextBytes);
         }
 
-
-
+        
+       
         ////checkcode
         //public void GetDetails()
         //{

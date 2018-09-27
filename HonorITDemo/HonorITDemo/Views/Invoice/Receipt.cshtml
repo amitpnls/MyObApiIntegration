@@ -1,0 +1,58 @@
+﻿@model HonorITDemo.Models.MyObCustomerPayment
+
+<h2>Receipt list</h2>
+<h4>Total Count: @Model.Count</h4>
+@{
+    int i = 1;
+}
+<table id="example" class="table table-bitemed table-condensed table-hover table-striped">
+    <thead>
+        <tr>
+            <th>Sr No.</th>
+            <th>Date</th>
+            <th>ID No.</th>
+            <th>Payee</th>
+            <th>Account</th>
+            <th>DepositTo</th>
+            <th>Memo</th>
+            <th>Amount received</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Items != null)
+        {
+            if (Model.Items.Count != 0)
+            {
+                foreach (var item in @Model.Items)
+                {
+                    <tr>
+                        <td align="left">@i</td>
+                        <td align="left">@item.Date.ToString("MM-dd-yyyy") </td>
+                        <td align="left">@item.ReceiptNumber</td>
+                        @if (item.Customer != null)
+                        {
+                            <td align="left">@(item.Customer.Name = item.Customer.Name == "" ? " " : item.Customer.Name) </td>
+                        }
+                        else
+                        {
+                            <td align="left"></td>
+                        }
+                        <td align="left">@item.Account.Name</td>
+                        <td align="left">@item.DepositTo</td>
+                        <td align="left">@item.Memo</td>
+                        <td align="right">@item.AmountReceived</td>
+                   @{
+                       i = i + 1;
+                    }
+                     </tr>
+                }
+            }
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+</script>

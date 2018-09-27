@@ -163,6 +163,14 @@
       <Private>True</Private>
       <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="Xero.Api, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Xero.API.SDK.Minimal.2.2.2\lib\net40\Xero.Api.dll</HintPath>
+    </Reference>
+    <Reference Include="Xero.Api.Example.Applications, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Xero.API.SDK.Minimal.2.2.2\lib\net40\Xero.Api.Example.Applications.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web.Http.WebHost">
@@ -224,6 +232,7 @@
     <Compile Include="Context\LoginContext.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\InvoiceController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PurchaseOrderController.cs" />
     <Compile Include="Controllers\QuotationController.cs" />
@@ -231,13 +240,20 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AccountRightService.cs" />
+    <Compile Include="Helpers\FromMyOb_ToXeroHelper.cs" />
     <Compile Include="Helpers\IAccountRightService.cs" />
     <Compile Include="Helpers\OAuthKeyService.cs" />
     <Compile Include="Helpers\OAuthServiceHelper.cs" />
+    <Compile Include="Models\AccountReceiptMyOb.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Common.cs" />
+    <Compile Include="Models\CustomerPaymentMyOb.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\InvoiceModel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\MyObCustomerPayment.cs" />
+    <Compile Include="Models\ReceiveMoneyListModel.cs" />
+    <Compile Include="Models\ReceiveMoneyMyOb.cs" />
     <Compile Include="Models\SupplierModel.cs" />
     <Compile Include="Models\QuotesModel.cs" />
     <Compile Include="Models\PurchaseOrderModel.cs" />
@@ -333,8 +349,12 @@
     <Content Include="SwaggerUI\lib\.DS_Store" />
     <Content Include="Views\Quotation\Quotations.cshtml" />
     <Content Include="Views\PurchaseOrder\PurchaseOrders.cshtml" />
+    <Content Include="Views\Invoice\Invoices.cshtml" />
+    <Content Include="Views\Invoice\Receipt.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />

@@ -19,6 +19,7 @@ namespace HonorITDemo.Controllers
             if (OAuthKeyService.OAuthInformation.Token == null)
             {
                 Common.ReGenerateToken();
+                return View("Index","Home");
             }
 
             string MYOBToken = OAuthKeyService.OAuthInformation.Token.AccessToken;
@@ -35,6 +36,7 @@ namespace HonorITDemo.Controllers
             if (OAuthKeyService.OAuthInformation.Token == null)
             {
                 Common.ReGenerateToken();
+                return View("Index", "Home");
             }
 
             string MYOBToken = OAuthKeyService.OAuthInformation.Token.AccessToken;
